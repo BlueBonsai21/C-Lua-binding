@@ -5,26 +5,28 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#define FILE_OPEN_FAIL -1
-#define SUCCESS 0
-#define GENERIC_FAIL 1
-#define MALLOC_FAIL 2
-#define REALLOC_FAIL 3
+//! errors
+#define FILE_OPEN_FAIL "FILE OPEN FAIL"
+#define GENERIC_FAIL "GENERIC FAIL"
+#define MALLOC_FAIL "MALLOC FAIL"
+#define REALLOC_FAIL "REALLOC FAIL"
+
+void throw_error(char *code) {
+    fprintf(stderr, "%s (F: %s, L:%i)\n", code, __FILE__, __LINE__);
+    exit(1);
+}
 
 int main(void) {
     FILE *luaFile = fopen("main.lua", "rb");
-    if (!luaFile) {
-        fprintf(stderr, "Error: %d", FILE_OPEN_FAIL);
-        exit(1);
-    }
+    if (!luaFile) throw_error(FILE_OPEN_FAIL);
+    
     fseek(luaFile, 0, SEEK_END);
-    long fileSize = ftell(luaFile);
+    long fileSize = ftell(luaFile); //? file size
     fseek(luaFile, 0, SEEK_SET);
+    
     char *luaCode = (char *)malloc(fileSize+1);
-    if (!luaCode) {
-        fprintf(stderr, "Error: %d", MALLOC_FAIL);
-        exit(1);
-    }
+    if (!luaCode) throw_error(MALLOC_FAIL);
+
     fread(luaCode, fileSize, 1, luaFile);
     fclose(luaFile);
     luaCode[fileSize] = 0;
@@ -39,5 +41,6 @@ int main(void) {
 
     free(luaCode);
     lua_close(L);
-    return SUCCESS;
+    
+    return 0;
 }
