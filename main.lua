@@ -1,3 +1,7 @@
-local x = -3;
+local COUNT = 3;
 
-print(x);
+local i = 0;
+while (i < COUNT) do
+    print(math.tan(COUNT));
+    i = i + 1;
+end
